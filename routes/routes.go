@@ -1,9 +1,17 @@
 package routes
 
-import "github.com/gofiber/fiber/v2"
+import (
+	"be-ruang-warga/config"
+	ruangriungDelivery "be-ruang-warga/internal/ruangriung/delivery"
+	ruangriungUsecase "be-ruang-warga/internal/ruangriung/usecase"
 
-func SetupRoutes(app *fiber.App) {
-	app.Get("/", func (c *fiber.Ctx) error  {
-		return c.SendString("Hallo brayy")
-	})
+	"github.com/gin-gonic/gin"
+)
+
+func RegisterRoutes(router *gin.Engine) {
+	db := config.DB
+	api := router.Group("/api")
+
+	rrUC := ruangriungUsecase.NewRuangRiungUsecase(db)
+	ruangriungDelivery.NewRuangRiungHandler(api, rrUC)
 }

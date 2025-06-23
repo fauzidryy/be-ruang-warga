@@ -4,18 +4,25 @@ import (
 	"be-ruang-warga/config"
 	"be-ruang-warga/routes"
 	"fmt"
+	"log"
+	"os"
 
-	"github.com/gofiber/fiber/v2"
+	"github.com/gin-gonic/gin"
 )
 
 func main() {
 	config.LoadEnv()
 	config.ConnectDB()
 
-	app := fiber.New()
-	routes.SetupRoutes(app)
+	router := gin.Default()
 
-	port := ":5434"
-	fmt.Println("running in" + port)
-	app.Listen(port)
+	routes.RegisterRoutes(router)
+
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = "3000"
+	}
+
+	fmt.Println("🚀 Server running on port", port)
+	log.Fatal(router.Run(":" + port))
 }
