@@ -8,14 +8,14 @@ import (
 )
 
 func LoadEnv() {
-	if os.Getenv("RAILWAY_ENVIRONMENT") == "" {
-		err := godotenv.Load()
+	if _, err := os.Stat(".env"); err == nil {
+		err = godotenv.Load()
 		if err != nil {
-			log.Println("⚠️  No .env file found. Continuing...")
+			log.Println("⚠️  Failed to load .env file:", err)
 		} else {
-			log.Println("✅ .env loaded locally")
+			log.Println("✅ .env file loaded")
 		}
 	} else {
-		log.Println("🌐 Running on Railway, skipping .env load")
+		log.Println("🌐 No .env file found, assume running in production")
 	}
 }
