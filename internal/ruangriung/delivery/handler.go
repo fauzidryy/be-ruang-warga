@@ -3,6 +3,7 @@ package delivery
 import (
 	"be-ruang-warga/internal/ruangriung/domain"
 	"be-ruang-warga/internal/ruangriung/usecase"
+	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -32,6 +33,7 @@ func (h *RuangRiungHandler) GetAll(c *gin.Context) {
 
 func (h *RuangRiungHandler) Create(c *gin.Context) {
 	var input domain.RuangRiung
+	fmt.Println("Masuk handler Update")
 
 	if err := c.ShouldBindJSON(&input); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
