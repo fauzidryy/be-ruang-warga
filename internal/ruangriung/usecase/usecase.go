@@ -7,8 +7,9 @@ import (
 )
 
 type RuangRiungUsecase interface {
-	Create(data *domain.RuangRiung) error
 	GetAll() ([]domain.RuangRiung, error)
+	Create(data *domain.RuangRiung) error
+	Update(id string, data *domain.RuangRiung) error
 }
 
 type ruangRiungUsecase struct {
@@ -19,12 +20,28 @@ func NewRuangRiungUsecase(db *gorm.DB) RuangRiungUsecase {
 	return &ruangRiungUsecase{db: db}
 }
 
-func (r *ruangRiungUsecase) Create(data *domain.RuangRiung) error {
-	return r.db.Create(data).Error
-}
-
 func (r *ruangRiungUsecase) GetAll() ([]domain.RuangRiung, error) {
 	var schedules []domain.RuangRiung
 	err := r.db.Find(&schedules).Error
 	return schedules, err
+}
+
+func (r *ruangRiungUsecase) Create(data *domain.RuangRiung) error {
+	return r.db.Create(data).Error
+}
+
+func (r *ruangRiungUsecase) Update(id string, data *domain.RuangRiung) error {
+	var existing domain.RuangRiung
+	if err := r.db.First(&existing, "id = ?", id).Error; err != nil {
+		return err
+	}
+
+	return r.db.Model(&existing).Updates(map[string]interface{}{
+		"title":         data.Title,
+		"description":   data.Description,
+		"schedule_time": data.ScheduleTime,
+		"location":      data.Location,
+		"poster_path":   data.PosterPath,
+		"performers":    data.Performers,
+	}).Error
 }
