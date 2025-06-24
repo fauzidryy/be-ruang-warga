@@ -16,6 +16,12 @@ func main() {
 
 	router := gin.Default()
 
+	router.GET("/", func(c *gin.Context) {
+		c.JSON(200, gin.H{
+			"message": "Ruang Warga API is running!",
+		})
+	})
+
 	routes.RegisterRoutes(router)
 
 	port := os.Getenv("PORT")
