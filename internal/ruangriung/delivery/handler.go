@@ -3,7 +3,6 @@ package delivery
 import (
 	"be-ruang-warga/internal/ruangriung/domain"
 	"be-ruang-warga/internal/ruangriung/usecase"
-	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -19,6 +18,7 @@ func NewRuangRiungHandler(router *gin.RouterGroup, uc usecase.RuangRiungUsecase)
 	router.GET("/ruangriung", h.GetAll)
 	router.POST("/ruangriung", h.Create)
 	router.PUT("/ruangriung/:id", h.Update)
+	router.DELETE("/ruangriung/:id", h.Delete)
 }
 
 func (h *RuangRiungHandler) GetAll(c *gin.Context) {
@@ -33,7 +33,6 @@ func (h *RuangRiungHandler) GetAll(c *gin.Context) {
 
 func (h *RuangRiungHandler) Create(c *gin.Context) {
 	var input domain.RuangRiung
-	fmt.Println("Masuk handler Update")
 
 	if err := c.ShouldBindJSON(&input); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -65,4 +64,16 @@ func (h *RuangRiungHandler) Update(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{"message": "Acara ruang riung berhasil di perbarui"})
+}
+
+func (h *RuangRiungHandler) Delete(c *gin.Context) {
+	id := c.Param("id")
+
+	err := h.UC.Delete(id)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "Berhasil hapus data"})
 }

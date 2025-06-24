@@ -10,6 +10,7 @@ type RuangRiungUsecase interface {
 	GetAll() ([]domain.RuangRiung, error)
 	Create(data *domain.RuangRiung) error
 	Update(id string, data *domain.RuangRiung) error
+	Delete(id string) error
 }
 
 type ruangRiungUsecase struct {
@@ -44,4 +45,9 @@ func (r *ruangRiungUsecase) Update(id string, data *domain.RuangRiung) error {
 	existing.Performers = data.Performers
 
 	return r.db.Save(&existing).Error
+}
+
+func(r *ruangRiungUsecase) Delete(id string) error {
+	var data domain.RuangRiung
+	return r.db.Delete(&data, id).Error
 }
