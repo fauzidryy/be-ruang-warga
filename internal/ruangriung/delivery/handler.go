@@ -17,7 +17,7 @@ func NewRuangRiungHandler(router *gin.RouterGroup, uc usecase.RuangRiungUsecase)
 
 	router.GET("/ruangriung", h.GetAll)
 	router.POST("/ruangriung", h.Create)
-	router.PATCH("/ruangriung", h.Update)
+	router.PUT("/ruangriung/:id", h.Update)
 }
 
 func (h *RuangRiungHandler) GetAll(c *gin.Context) {
