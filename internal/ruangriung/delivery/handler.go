@@ -17,6 +17,7 @@ func NewRuangRiungHandler(router *gin.RouterGroup, uc usecase.RuangRiungUsecase)
 
 	router.GET("/ruangriung", h.GetAll)
 	router.POST("/ruangriung", h.Create)
+	router.PATCH("/ruangriung", h.Update)
 }
 
 func (h *RuangRiungHandler) GetAll(c *gin.Context) {
@@ -44,4 +45,22 @@ func (h *RuangRiungHandler) Create(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{"message": "Acara ruang riung berhasil di tambahkan"})
+}
+
+func (h *RuangRiungHandler) Update(c *gin.Context) {
+	id := c.Param("id")
+
+	var update domain.RuangRiung
+	if err := c.ShouldBindJSON(&update); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	err := h.UC.Update(id, &update)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "Acara ruang riung berhasil di perbarui"})
 }
