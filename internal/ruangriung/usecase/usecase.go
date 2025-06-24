@@ -32,16 +32,16 @@ func (r *ruangRiungUsecase) Create(data *domain.RuangRiung) error {
 
 func (r *ruangRiungUsecase) Update(id string, data *domain.RuangRiung) error {
 	var existing domain.RuangRiung
-	if err := r.db.First(&existing, "id = ?", id).Error; err != nil {
+	if err := r.db.First(&existing, id).Error; err != nil {
 		return err
 	}
 
-	return r.db.Model(&existing).Updates(map[string]interface{}{
-		"title":         data.Title,
-		"description":   data.Description,
-		"schedule_time": data.ScheduleTime,
-		"location":      data.Location,
-		"poster_path":   data.PosterPath,
-		"performers":    data.Performers,
-	}).Error
+	existing.Title = data.Title
+	existing.Description = data.Description
+	existing.ScheduleTime = data.ScheduleTime
+	existing.Location = data.Location
+	existing.PosterPath = data.PosterPath
+	existing.Performers = data.Performers
+
+	return r.db.Save(&existing).Error
 }
