@@ -1,0 +1,18 @@
+# railway.toml
+[build]
+# Anda bisa punya konfigurasi build di sini, seperti:
+# builder = "nixpacks" # atau "dockerfile"
+# root = "." # Jika root aplikasi ada di sini
+
+[deploy]
+# Konfigurasi deployment lainnya bisa di sini
+
+# Bagian ini untuk mendefinisikan file yang akan disuntikkan
+[[files]]
+# localPath adalah jalur file di repositori Git lokal kamu.
+# Asumsikan kamu menyimpan file JSON di dalam folder 'config' di root proyek.
+localPath = "config/serviceAccountKey.json"
+
+# remotePath adalah jalur tempat file akan tersedia di dalam kontainer Railway kamu.
+# Ini adalah jalur yang akan diacu oleh FIREBASE_SERVICE_ACCOUNT_KEY_PATH.
+remotePath = "/app/config/serviceAccountKey.json"
