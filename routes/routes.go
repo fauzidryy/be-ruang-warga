@@ -2,8 +2,10 @@ package routes
 
 import (
 	"be-ruang-warga/config"
-	ruangriungDelivery "be-ruang-warga/internal/ruangriung/delivery"
-	ruangriungUsecase "be-ruang-warga/internal/ruangriung/usecase"
+	ruangRiungDelivery "be-ruang-warga/internal/ruangriung/delivery"
+	ruangRiungUsecase "be-ruang-warga/internal/ruangriung/usecase"
+	userDelivery "be-ruang-warga/internal/user/delivery"
+	userUsecase "be-ruang-warga/internal/user/usecase"
 
 	"github.com/gin-gonic/gin"
 )
@@ -12,6 +14,9 @@ func RegisterRoutes(router *gin.Engine) {
 	db := config.DB
 	api := router.Group("/api")
 
-	rrUC := ruangriungUsecase.NewRuangRiungUsecase(db)
-	ruangriungDelivery.NewRuangRiungHandler(api, rrUC)
+	rrUC := ruangRiungUsecase.NewRuangRiungUsecase(db)
+	uUC := userUsecase.NewUserUsecase(db)
+
+	userDelivery.NewUserHandler(api, uUC)
+	ruangRiungDelivery.NewRuangRiungHandler(api, rrUC)
 }
