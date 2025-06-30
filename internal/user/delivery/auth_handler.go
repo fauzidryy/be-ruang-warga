@@ -5,55 +5,76 @@ import (
 	"be-ruang-warga/utils"
 	"context"
 	"net/http"
-	"os"
+	// "os" // <-- Hapus ini
+	"fmt"
 
 	"github.com/gin-gonic/gin"
-	"google.golang.org/api/idtoken"
+	firebaseAuth "firebase.google.com/go/v4/auth" // <-- Ganti ini
+	// "google.golang.org/api/idtoken" // <-- Hapus ini
 )
 
 type UserHandler struct {
 	UC usecase.UserUsecase
+	AuthClient *firebaseAuth.Client // <-- Tambahkan ini
 }
 
-func NewUserHandler(router *gin.RouterGroup, uc usecase.UserUsecase) {
-	h := &UserHandler{UC: uc}
+// Modifikasi NewUserHandler untuk menerima authClient
+func NewUserHandler(router *gin.RouterGroup, uc usecase.UserUsecase, authClient *firebaseAuth.Client) { // <-- Perubahan di sini!
+	h := &UserHandler{UC: uc, AuthClient: authClient} // <-- Assign authClient di sini
 
 	router.POST("/auth/google", h.GoogleAuthHandler)
 }
 
 func (h *UserHandler) GoogleAuthHandler(c *gin.Context) {
+	fmt.Println("GoogleAuthHandler called.")
 	var req struct {
 		IdToken string `json:"id_token"`
 	}
 
 	if err := c.BindJSON(&req); err != nil {
+		fmt.Println("Error binding JSON:", err.Error())
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	payload, err := idtoken.Validate(context.Background(), req.IdToken, os.Getenv("GOOGLE_CLIENT_ID"))
-	if err != nil {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": err.Error()})
-		return
+	if len(req.IdToken) > 30 {
+		fmt.Println("Received ID Token (first 30 chars):", req.IdToken[:30]+"...")
+	} else {
+		fmt.Println("Received ID Token:", req.IdToken)
 	}
 
-	email := payload.Claims["email"].(string)
-	name := payload.Claims["name"].(string)
+	// --- Gunakan Firebase Admin SDK untuk memverifikasi token ---
+	token, err := h.AuthClient.VerifyIDToken(context.Background(), req.IdToken) // <-- Ini perubahannya!
+	if err != nil {
+		fmt.Println("Firebase ID Token verification failed:", err) // <-- Log error spesifik!
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid or expired ID token."})
+		return
+	}
+	// --- Selesai verifikasi token ---
+
+	email := token.Claims["email"].(string)
+	name := token.Claims["name"].(string)
+
+	fmt.Println("Firebase ID Token verified successfully for email:", email)
 
 	user, err := h.UC.FindOrCreateUser(email, name)
 	if err != nil {
+		fmt.Println("Error finding or creating user:", err.Error())
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 
-	token, err := utils.GenerateJWT(*user)
+	jwtToken, err := utils.GenerateJWT(*user)
 	if err != nil {
+		fmt.Println("Error generating JWT:", err.Error())
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
+
+	fmt.Println("Successfully processed Google Auth. User:", user.Email, "Generated JWT:", jwtToken[:20]+"...")
 
 	c.JSON(http.StatusOK, gin.H{
-		"token": token,
+		"token": jwtToken,
 		"user":  user,
 	})
 }
