@@ -1,21 +1,23 @@
 package config
 
 import (
-	"context" // Import ini
+	"context"
 	"fmt"
 	"log"
 	"os"
 
-	firebase "firebase.google.com/go/v4"         // Import ini
-	"firebase.google.com/go/v4/auth"              // Import ini
+	firebase "firebase.google.com/go/v4"
+	"firebase.google.com/go/v4/auth"
+	"google.golang.org/api/option"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
-	"google.golang.org/api/option" // Import ini
+
+	"be-ruang-warga/internal/user/domain"
 )
 
 var (
 	DB         *gorm.DB
-	AuthClient *auth.Client // <-- Tambahkan ini untuk menyimpan Firebase Auth Client
+	AuthClient *auth.Client
 )
 
 func ConnectDB() {
@@ -34,17 +36,13 @@ func ConnectDB() {
 	DB = database
 	fmt.Println("Success to connect Database")
 
-	// PENTING: Lakukan AutoMigrate di sini setelah DB terkoneksi
-	// Contoh (jika kamu punya model User dan AdminRequest di be-ruang-warga/internal/user/domain):
-	// import "be-ruang-warga/internal/user/domain"
-	// err = DB.AutoMigrate(&domain.User{}, &domain.AdminRequest{})
-	// if err != nil {
-	//     log.Fatalf("Failed to auto-migrate database schema: %v", err)
-	// }
-	// fmt.Println("Database migration completed successfully!")
+	err = DB.AutoMigrate(&domain.User{})
+	if err != nil {
+		log.Fatalf("Failed to auto-migrate database schema: %v", err)
+	}
+	fmt.Println("Database migration completed successfully!")
 }
 
-// --- FUNGSI BARU UNTUK INISIALISASI FIREBASE ---
 func InitFirebase() {
 	ctx := context.Background()
 
@@ -60,10 +58,9 @@ func InitFirebase() {
 	}
 	fmt.Println("Firebase Admin SDK initialized successfully.")
 
-	AuthClient, err = app.Auth(ctx) // Assign ke global variable AuthClient
+	AuthClient, err = app.Auth(ctx)
 	if err != nil {
 		log.Fatalf("Error getting Firebase Auth client: %v", err)
 	}
 	fmt.Println("Firebase Auth client obtained.")
 }
-// --- End of Firebase Initialization ---

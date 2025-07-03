@@ -4,23 +4,20 @@ import (
 	"be-ruang-warga/internal/user/usecase"
 	"be-ruang-warga/utils"
 	"context"
-	"net/http"
-	// "os" // <-- Hapus ini
 	"fmt"
+	"net/http"
 
+	firebaseAuth "firebase.google.com/go/v4/auth"
 	"github.com/gin-gonic/gin"
-	firebaseAuth "firebase.google.com/go/v4/auth" // <-- Ganti ini
-	// "google.golang.org/api/idtoken" // <-- Hapus ini
 )
 
 type UserHandler struct {
-	UC usecase.UserUsecase
-	AuthClient *firebaseAuth.Client // <-- Tambahkan ini
+	UC         usecase.UserUsecase
+	AuthClient *firebaseAuth.Client
 }
 
-// Modifikasi NewUserHandler untuk menerima authClient
-func NewUserHandler(router *gin.RouterGroup, uc usecase.UserUsecase, authClient *firebaseAuth.Client) { // <-- Perubahan di sini!
-	h := &UserHandler{UC: uc, AuthClient: authClient} // <-- Assign authClient di sini
+func NewUserHandler(router *gin.RouterGroup, uc usecase.UserUsecase, authClient *firebaseAuth.Client) {
+	h := &UserHandler{UC: uc, AuthClient: authClient}
 
 	router.POST("/auth/google", h.GoogleAuthHandler)
 }
@@ -43,14 +40,12 @@ func (h *UserHandler) GoogleAuthHandler(c *gin.Context) {
 		fmt.Println("Received ID Token:", req.IdToken)
 	}
 
-	// --- Gunakan Firebase Admin SDK untuk memverifikasi token ---
-	token, err := h.AuthClient.VerifyIDToken(context.Background(), req.IdToken) // <-- Ini perubahannya!
+	token, err := h.AuthClient.VerifyIDToken(context.Background(), req.IdToken)
 	if err != nil {
-		fmt.Println("Firebase ID Token verification failed:", err) // <-- Log error spesifik!
+		fmt.Println("Firebase ID Token verification failed:", err)
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid or expired ID token."})
 		return
 	}
-	// --- Selesai verifikasi token ---
 
 	email := token.Claims["email"].(string)
 	name := token.Claims["name"].(string)
