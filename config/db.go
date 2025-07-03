@@ -12,7 +12,8 @@ import (
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 
-	"be-ruang-warga/internal/user/domain"
+	domainRuangRiung "be-ruang-warga/internal/ruangriung/domain"
+	domainUser "be-ruang-warga/internal/user/domain"
 )
 
 var (
@@ -36,7 +37,8 @@ func ConnectDB() {
 	DB = database
 	fmt.Println("Success to connect Database")
 
-	err = DB.AutoMigrate(&domain.User{})
+	err = DB.AutoMigrate(&domainUser.User{})
+	DB.AutoMigrate(&domainRuangRiung.RuangRiung{})
 	if err != nil {
 		log.Fatalf("Failed to auto-migrate database schema: %v", err)
 	}

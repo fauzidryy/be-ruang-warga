@@ -23,7 +23,7 @@ func NewUserHandler(router *gin.RouterGroup, uc usecase.UserUsecase, authClient 
 }
 
 func (h *UserHandler) GoogleAuthHandler(c *gin.Context) {
-	fmt.Println("GoogleAuthHandler called.")
+	ctx := context.Background()
 	var req struct {
 		IdToken string `json:"id_token"`
 	}
@@ -40,7 +40,7 @@ func (h *UserHandler) GoogleAuthHandler(c *gin.Context) {
 		fmt.Println("Received ID Token:", req.IdToken)
 	}
 
-	token, err := h.AuthClient.VerifyIDToken(context.Background(), req.IdToken)
+	token, err := h.AuthClient.VerifyIDToken(ctx, req.IdToken)
 	if err != nil {
 		fmt.Println("Firebase ID Token verification failed:", err)
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid or expired ID token."})
