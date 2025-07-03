@@ -11,8 +11,8 @@
 [[files]]
 # localPath adalah jalur file di repositori Git lokal kamu.
 # Asumsikan kamu menyimpan file JSON di dalam folder 'config' di root proyek.
-localPath = "config/serviceAccountKey.json"
+localPath = "config/serviceAccountKey.json" # Pastikan ini sesuai dengan lokasi file di repositori Git kamu.
 
 # remotePath adalah jalur tempat file akan tersedia di dalam kontainer Railway kamu.
 # Ini adalah jalur yang akan diacu oleh FIREBASE_SERVICE_ACCOUNT_KEY_PATH.
-remotePath = "/app/config/serviceAccountKey.json"
+remotePath = "/app/config/serviceAccountKey.json" # Ini akan menjadi lokasi file di dalam container Railway.
