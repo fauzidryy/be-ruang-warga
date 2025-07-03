@@ -48,9 +48,9 @@ func ConnectDB() {
 func InitFirebase() {
 	ctx := context.Background()
 
-	serviceAccountKeyPath := os.Getenv("FIREBASE_SERVICE_ACCOUNT_KEY_PATH")
+	serviceAccountKeyPath := os.Getenv("GOOGLE_APPLICATION_CREDENTIALS_JSON ")
 	if serviceAccountKeyPath == "" {
-		log.Fatal("FIREBASE_SERVICE_ACCOUNT_KEY_PATH environment variable is not set. Please specify the path to your Firebase service account key JSON file.")
+		log.Fatal("GOOGLE_APPLICATION_CREDENTIALS_JSON environment variable is not set. Please specify the path to your Firebase service account key JSON file.")
 	}
 
 	sa := option.WithCredentialsFile(serviceAccountKeyPath)
