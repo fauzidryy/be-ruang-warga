@@ -43,7 +43,7 @@ func (h *UserHandler) GoogleAuthHandler(c *gin.Context) {
 	token, err := h.AuthClient.VerifyIDToken(ctx, req.IdToken)
 	if err != nil {
 		fmt.Println("Firebase ID Token verification failed:", err)
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid or expired ID token."})
+		c.JSON(http.StatusUnauthorized, gin.H{"error": err.Error()})
 		return
 	}
 
