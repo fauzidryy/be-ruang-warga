@@ -13,7 +13,7 @@ import (
 func main() {
 	config.LoadEnv()
 	config.ConnectDB()
-	config.InitFirebase() // <-- Panggil fungsi inisialisasi Firebase di sini!
+	config.InitFirebase()
 
 	router := gin.New()
 	router.Use(gin.Logger())
@@ -25,9 +25,7 @@ func main() {
 		})
 	})
 
-	// Sekarang, lewati config.DB dan config.AuthClient ke RegisterRoutes
-	routes.RegisterRoutes(router) // <-- Parameter DB dan AuthClient akan diakses dari global var di package config
-    // routes.RegisterRoutes(router, config.DB, config.AuthClient) // Jika kamu lebih suka passing explicitly
+	routes.RegisterRoutes(router)
 
 	port := os.Getenv("PORT")
 	if port == "" {
