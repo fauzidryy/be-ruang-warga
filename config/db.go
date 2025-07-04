@@ -48,12 +48,12 @@ func ConnectDB() {
 func InitFirebase() {
 	ctx := context.Background()
 
-	serviceAccountKeyPath := os.Getenv("GOOGLE_APPLICATION_CREDENTIALS_JSON")
-	if serviceAccountKeyPath == "" {
-		log.Fatal("GOOGLE_APPLICATION_CREDENTIALS_JSON environment variable is not set. Please specify the path to your Firebase service account key JSON file.")
+	serviceAccountJSON := os.Getenv("GOOGLE_APPLICATION_CREDENTIALS_JSON")
+	if serviceAccountJSON == "" {
+		log.Fatal("GOOGLE_APPLICATION_CREDENTIALS_JSON environment variable is not set. Please add your Firebase service account JSON content directly as an env variable in Railway.")
 	}
 
-	sa := option.WithCredentialsFile(serviceAccountKeyPath)
+	sa := option.WithCredentialsJSON([]byte(serviceAccountJSON))
 	app, err := firebase.NewApp(ctx, nil, sa)
 	if err != nil {
 		log.Fatalf("Error initializing Firebase app: %v", err)
